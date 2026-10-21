@@ -158,6 +158,9 @@ async function refresh($: Engine, state: State): Promise<void> {
 }
 
 export const register: Register = (on, options) => {
+  // The defaults mirror plugin.json's userConfig. Options arrive as an untyped
+  // record whose keys may be absent (install has shown the script "not yet set"),
+  // and the schema does not hold indicatorColumns to a whole number of at least zero.
   const script = options.script
   const indicatorColumns = options.indicatorColumns
   const state: State = {
