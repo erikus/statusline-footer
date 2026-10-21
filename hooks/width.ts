@@ -1,6 +1,6 @@
 /** Terminal column width of text: wide (East Asian W/F) code points take two cells, zero-width marks none. */
 
-/** Inclusive code point ranges that East Asian Width (Unicode 15) marks W or F. */
+/** Inclusive code point ranges that East Asian Width (Unicode 15) marks W or F, in ascending order. */
 const WIDE_RANGES: ReadonlyArray<readonly [number, number]> = [
   [0x1100, 0x115f], [0x231a, 0x231b], [0x2329, 0x232a], [0x23e9, 0x23ec], [0x23f0, 0x23f0], [0x23f3, 0x23f3],
   [0x25fd, 0x25fe], [0x2614, 0x2615], [0x2648, 0x2653], [0x267f, 0x267f], [0x2693, 0x2693], [0x26a1, 0x26a1],
@@ -37,16 +37,8 @@ const WIDE_CELLS = 2
 const NARROW_CELLS = 1
 
 function isWide(codePoint: number): boolean {
-  let low = 0
-  let high = WIDE_RANGES.length - 1
-  while (low <= high) {
-    const middle = (low + high) >> 1
-    const [first, last] = WIDE_RANGES[middle]
-    if (codePoint < first) high = middle - 1
-    else if (codePoint > last) low = middle + 1
-    else return true
-  }
-  return false
+  const range = WIDE_RANGES.find(([, last]) => codePoint <= last)
+  return range !== undefined && codePoint >= range[0]
 }
 
 /** Cells one code point occupies. */
