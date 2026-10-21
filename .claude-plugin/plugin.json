@@ -1,0 +1,26 @@
+{
+  "name": "statusline-footer",
+  "version": "0.1.0",
+  "description": "Status line adapter for the mode line: runs your statusLine command and draws its output on the mode line row, saving a terminal row",
+  "author": {
+    "name": "Erik Staab",
+    "email": "erik@estaab.dev"
+  },
+  "license": "MIT",
+  "keywords": [
+    "statusline",
+    "status-line",
+    "mode-line",
+    "footer",
+    "terminal",
+    "mobile"
+  ],
+  "userConfig": {
+    "script": {
+      "type": "string",
+      "description": "Status line command to run, relative to your home directory (the same script your statusLine setting ran)",
+      "default": ".claude/statusline.sh",
+      "title": "Status line script"
+    }
+  }
+}

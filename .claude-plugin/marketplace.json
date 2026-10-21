@@ -1,0 +1,13 @@
+{
+  "name": "statusline-footer",
+  "owner": {
+    "name": "Erik Staab"
+  },
+  "plugins": [
+    {
+      "name": "statusline-footer",
+      "source": "./"
+    }
+  ],
+  "description": "Status line adapter for the Claude Code mode line"
+}
