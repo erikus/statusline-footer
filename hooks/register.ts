@@ -145,7 +145,7 @@ async function refresh($: Engine, state: State): Promise<void> {
       try {
         next = await runScript($, state.scriptRelativePath, roomColumns(state))
       } catch (error) {
-        next = `statusline.sh failed: ${error instanceof Error ? error.message : String(error)}`
+        next = `statusline-footer: ${state.scriptRelativePath} failed: ${error instanceof Error ? error.message : String(error)}`
       }
       if (next !== state.line) {
         state.line = next
