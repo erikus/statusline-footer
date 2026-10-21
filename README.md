@@ -16,13 +16,13 @@ not change; the mod only changes where its output is drawn.
 At the prompt of a terminal session:
 
 ```
-/plugin install statusline-footer --marketplace estaab/statusline-footer
+/plugin install statusline-footer --marketplace erikus/statusline-footer
 ```
 
 Answer `y` to add the marketplace, then pick a scope (user is first). From a shell the
-same is `claude plugin install statusline-footer --marketplace estaab/statusline-footer`.
+same is `claude plugin install statusline-footer --marketplace erikus/statusline-footer`.
 In the desktop app, click + next to the prompt box, then Plugins, Add marketplace with
-`estaab/statusline-footer`, then Add plugin.
+`erikus/statusline-footer`, then Add plugin.
 
 Then remove the `statusLine` entry from `~/.claude/settings.json`, or the status line is
 drawn twice. To go back, uninstall the mod and put the entry back, for example:
