@@ -1,4 +1,4 @@
-import type { Engine, Register, SessionUsage } from 'claude-code'
+import type { EngineInterface, Register, SessionUsage } from 'claude-code'
 import { parseAnsi, type StyledRun } from './ansi'
 import { fitToColumns } from './width'
 
@@ -48,7 +48,7 @@ type StatusLineInput = {
   exceeds_200k_tokens: boolean
 }
 
-async function buildInput($: Engine, usage: SessionUsage): Promise<StatusLineInput> {
+async function buildInput($: EngineInterface, usage: SessionUsage): Promise<StatusLineInput> {
   const [cwd, root, model, sessionId, version, now] = await Promise.all([
     $.session.cwd(),
     $.session.root(),
@@ -96,7 +96,7 @@ export function fitRuns(runs: readonly StyledRun[], maxColumns: number): StyledR
   return fitted
 }
 
-async function runScript($: Engine, scriptRelativePath: string, columns: number): Promise<string> {
+async function runScript($: EngineInterface, scriptRelativePath: string, columns: number): Promise<string> {
   const home = (await $.env.get('HOME')) ?? ''
   const scriptPath = `${home}/${scriptRelativePath}`
   if (!(await $.fs.exists(scriptPath))) {
@@ -132,7 +132,7 @@ function roomColumns(state: State): number {
 }
 
 /** Re-runs the script and redraws the hint row when its output changed; one run at a time. */
-async function refresh($: Engine, state: State): Promise<void> {
+async function refresh($: EngineInterface, state: State): Promise<void> {
   if (state.isRefreshing) {
     state.isRefreshWanted = true
     return
