@@ -37,7 +37,8 @@ drawn twice. To go back, uninstall the mod and put the entry back, for example:
 | -------- | ----------------------- | ---------------------------------------------------------- |
 | `script` | `.claude/statusline.sh` | The status line command, as a path under your home folder. |
 
-Change it in `/config` under the plugin's row.
+Change it in `/config` under the plugin's row. The install step may say the option is
+"not yet set"; the default applies until you set it.
 
 ## What the script receives
 
