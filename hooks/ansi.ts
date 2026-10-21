@@ -42,18 +42,13 @@ const SGR_BACKGROUND_BRIGHT_LAST = 107
 const EXTENDED_MODE_256 = 5
 const EXTENDED_MODE_RGB = 2
 
-/** The 16 named colors of the basic SGR range, as the surface names them. */
+/** The 16 named colors of the basic SGR range and 256-color indices 0–15, as the surface names them. */
 const BASIC_COLOR_NAMES: readonly string[] = [
   'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
   'gray', 'redBright', 'greenBright', 'yellowBright', 'blueBright', 'magentaBright', 'cyanBright', 'whiteBright',
 ]
 /** Where the bright half of the basic color names starts. */
 const BRIGHT_COLOR_OFFSET = 8
-/** Hex of the 16 basic colors in the xterm palette, for 256-color indices 0–15. */
-const BASIC_COLOR_HEX: readonly string[] = [
-  '#000000', '#800000', '#008000', '#808000', '#000080', '#800080', '#008080', '#c0c0c0',
-  '#808080', '#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#00ffff', '#ffffff',
-]
 /** Channel levels of the 6x6x6 color cube, 256-color indices 16–231. */
 const CUBE_LEVELS: readonly number[] = [0, 95, 135, 175, 215, 255]
 const CUBE_FIRST_INDEX = 16
@@ -71,10 +66,10 @@ function rgbHex(r: number, g: number, b: number): string {
   return `#${hex2(r)}${hex2(g)}${hex2(b)}`
 }
 
-/** The hex color of a 256-color palette index, or undefined when out of range. */
-export function paletteHex(index: number): string | undefined {
+/** The color of a 256-color palette index (a name for the basic 16, else hex), or undefined when out of range. */
+export function paletteColor(index: number): string | undefined {
   if (!Number.isInteger(index) || index < 0 || index >= PALETTE_SIZE) return undefined
-  if (index < CUBE_FIRST_INDEX) return BASIC_COLOR_HEX[index]
+  if (index < CUBE_FIRST_INDEX) return BASIC_COLOR_NAMES[index]
   if (index < GRAY_FIRST_INDEX) {
     const cube = index - CUBE_FIRST_INDEX
     const r = CUBE_LEVELS[Math.floor(cube / (CUBE_SIDE * CUBE_SIDE))] ?? 0
@@ -90,7 +85,7 @@ export function paletteHex(index: number): string | undefined {
 function readExtendedColor(codes: readonly number[], at: number): { color?: string; consumed: number } {
   const mode = codes[at]
   if (mode === EXTENDED_MODE_256) {
-    return { color: paletteHex(codes[at + 1] ?? -1), consumed: 2 }
+    return { color: paletteColor(codes[at + 1] ?? -1), consumed: 2 }
   }
   if (mode === EXTENDED_MODE_RGB) {
     const [r, g, b] = [codes[at + 1], codes[at + 2], codes[at + 3]]

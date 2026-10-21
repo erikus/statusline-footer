@@ -1,15 +1,15 @@
 import { expect, test } from 'claude-code/testing'
-import { paletteHex, parseAnsi } from './ansi'
+import { paletteColor, parseAnsi } from './ansi'
 
-test('paletteHex maps the 256-color palette', async () => {
-  expect(paletteHex(0)).toBe('#000000')
-  expect(paletteHex(9)).toBe('#ff0000')
-  expect(paletteHex(16)).toBe('#000000')
-  expect(paletteHex(39)).toBe('#00afff')
-  expect(paletteHex(231)).toBe('#ffffff')
-  expect(paletteHex(232)).toBe('#080808')
-  expect(paletteHex(255)).toBe('#eeeeee')
-  expect(paletteHex(256)).toBeUndefined()
+test('paletteColor maps the 256-color palette', async () => {
+  expect(paletteColor(0)).toBe('black')
+  expect(paletteColor(9)).toBe('redBright')
+  expect(paletteColor(16)).toBe('#000000')
+  expect(paletteColor(39)).toBe('#00afff')
+  expect(paletteColor(231)).toBe('#ffffff')
+  expect(paletteColor(232)).toBe('#080808')
+  expect(paletteColor(255)).toBe('#eeeeee')
+  expect(paletteColor(256)).toBeUndefined()
 })
 
 test('parseAnsi splits the status line into styled runs without control characters', async () => {
