@@ -47,6 +47,8 @@ const BASIC_COLOR_NAMES: readonly string[] = [
   'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
   'gray', 'redBright', 'greenBright', 'yellowBright', 'blueBright', 'magentaBright', 'cyanBright', 'whiteBright',
 ]
+/** Where the bright half of the basic color names starts. */
+const BRIGHT_COLOR_OFFSET = 8
 /** Hex of the 16 basic colors in the xterm palette, for 256-color indices 0–15. */
 const BASIC_COLOR_HEX: readonly string[] = [
   '#000000', '#800000', '#008000', '#808000', '#000080', '#800080', '#008080', '#c0c0c0',
@@ -118,9 +120,9 @@ function applySgr(style: Style, params: string): Style {
     } else if (code >= SGR_BACKGROUND_BASIC_FIRST && code <= SGR_BACKGROUND_BASIC_LAST) {
       next.backgroundColor = BASIC_COLOR_NAMES[code - SGR_BACKGROUND_BASIC_FIRST]
     } else if (code >= SGR_FOREGROUND_BRIGHT_FIRST && code <= SGR_FOREGROUND_BRIGHT_LAST) {
-      next.color = BASIC_COLOR_NAMES[code - SGR_FOREGROUND_BRIGHT_FIRST + CUBE_FIRST_INDEX / 2]
+      next.color = BASIC_COLOR_NAMES[code - SGR_FOREGROUND_BRIGHT_FIRST + BRIGHT_COLOR_OFFSET]
     } else if (code >= SGR_BACKGROUND_BRIGHT_FIRST && code <= SGR_BACKGROUND_BRIGHT_LAST) {
-      next.backgroundColor = BASIC_COLOR_NAMES[code - SGR_BACKGROUND_BRIGHT_FIRST + CUBE_FIRST_INDEX / 2]
+      next.backgroundColor = BASIC_COLOR_NAMES[code - SGR_BACKGROUND_BRIGHT_FIRST + BRIGHT_COLOR_OFFSET]
     } else if (code === SGR_FOREGROUND_EXTENDED || code === SGR_BACKGROUND_EXTENDED) {
       const { color, consumed } = readExtendedColor(codes, i + 1)
       if (code === SGR_FOREGROUND_EXTENDED) next.color = color
