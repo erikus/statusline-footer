@@ -15,10 +15,11 @@ export type StyledRun = {
 
 type Style = Omit<StyledRun, 'text'>
 
-const SGR_PATTERN = /\x1b\[([0-9;]*)m/g
-const IS_SGR_PATTERN = /^\x1b\[[0-9;]*m$/
-/** Every other escape sequence (cursor moves, OSC titles), dropped from the text. */
-const OTHER_ESCAPE_PATTERN = /\x1b\][^\x07]*\x07|\x1b\[[0-9;?]*[A-Za-z]|\x1b[^[\]]/g
+/**
+ * Every escape sequence: an SGR escape captures its parameters; any other (cursor
+ * moves, OSC titles) captures nothing and is dropped from the text.
+ */
+const ESCAPE_PATTERN = /\x1b\[([0-9;]*)m|\x1b\][^\x07]*\x07|\x1b\[[0-9;?]*[A-Za-z]|\x1b[^[\]]/g
 /** Other C0 control characters a Text element also refuses, dropped. */
 const CONTROL_PATTERN = /[\x00-\x08\x0b-\x1f\x7f]/g
 
@@ -132,7 +133,6 @@ function applySgr(style: Style, params: string): Style {
 
 /** Splits `line` into styled runs; empty runs are dropped. */
 export function parseAnsi(line: string): StyledRun[] {
-  const cleaned = line.replace(OTHER_ESCAPE_PATTERN, (match) => (IS_SGR_PATTERN.test(match) ? match : ''))
   const runs: StyledRun[] = []
   let style: Style = { dim: false, bold: false }
   let last = 0
@@ -140,12 +140,16 @@ export function parseAnsi(line: string): StyledRun[] {
     const safe = text.replace(CONTROL_PATTERN, '')
     if (safe !== '') runs.push({ text: safe, ...style })
   }
-  SGR_PATTERN.lastIndex = 0
-  for (let match = SGR_PATTERN.exec(cleaned); match !== null; match = SGR_PATTERN.exec(cleaned)) {
-    push(cleaned.slice(last, match.index))
-    style = applySgr(style, match[1] ?? '')
+  let text = ''
+  for (const match of line.matchAll(ESCAPE_PATTERN)) {
+    text += line.slice(last, match.index)
     last = match.index + match[0].length
+    const params = match[1]
+    if (params === undefined) continue
+    push(text)
+    text = ''
+    style = applySgr(style, params)
   }
-  push(cleaned.slice(last))
+  push(text + line.slice(last))
   return runs
 }
