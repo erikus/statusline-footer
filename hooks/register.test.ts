@@ -23,7 +23,7 @@ for (const surface of ['terminal', 'desktop'] as const) {
     on('session.root', () => ({ value: '/home/tester/project' }))
     on('session.model', () => ({ value: 'claude-fable-5-1' }))
     on('session.id', () => ({ value: 'session-1' }))
-    on('session.version', () => ({ value: { version: '2.1.302', base: '2.1.302', builtAt: 0 } }))
+    on('session.version', () => ({ value: { version: '2.1.302', base: '2.1.302', builtAt: '2026-10-20T00:00:00Z' } }))
     on('session.usage', () => ({
       value: {
         startedAt: clock.now() - 60_000,
