@@ -1,6 +1,6 @@
 # statusline-footer
 
-A status line adapter for the Claude Code mode line. It runs the same command your
+Merge Claude Code's status line into the mode line. It runs the same command your
 `statusLine` setting runs, feeds it the same JSON, and draws the result on the mode line
 row, right after the mode indicator, instead of on a row of its own:
 
@@ -8,8 +8,8 @@ row, right after the mode indicator, instead of on a row of its own:
 ⏵⏵ auto mode on · 🧠F5.1 📁my-project ⎇ main $0.42
 ```
 
-That saves one terminal row, which matters on a phone or a split pane. Your script does
-not change; the mod only changes where its output is drawn.
+That saves one terminal row, which is helpful on phones. No status line script changes
+are needed; the mod only changes where its output is drawn.
 
 ## Install
 
@@ -38,7 +38,7 @@ drawn twice. To go back, uninstall the mod and put the entry back, for example:
 | `script`           | `.claude/statusline.sh` | The status line command, as a path under your home folder.              |
 | `indicatorColumns` | `23`                    | Columns the mode indicator takes before the line (margin + label + " · "). |
 
-The mod cuts the script's output so the row never wraps. `23` fits "accept edits on", the
+The mod cuts the script's output so the row doesn't wrap. `23` fits "accept edits on", the
 longest common label. Lower it to `20` if you always run in auto mode, or raise it to `29`
 for "bypass permissions on". If no file exists at the `script` path,
 the row says so and names the path.
