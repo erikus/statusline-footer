@@ -208,8 +208,8 @@ export const register: Register = (on, options) => {
     }
     const { Text } = $.ui.resolve(e)
     const runs = fitRuns(parseAnsi(state.line), roomColumns(state)).map((run) =>
-      h(Text, { color: run.color, backgroundColor: run.backgroundColor, dimColor: run.dim, bold: run.bold }, run.text),
+      Text({ color: run.color, backgroundColor: run.backgroundColor, dimColor: run.dim, bold: run.bold, children: run.text }),
     )
-    return h(Text, { wrap: 'truncate' }, ...runs)
+    return Text({ wrap: 'truncate', children: runs })
   })
 }

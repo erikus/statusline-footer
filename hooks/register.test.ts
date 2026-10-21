@@ -77,7 +77,7 @@ test('draws nothing of its own before the script has answered', async ($, on) =>
   mock.clock(on)
   on('ui.render', ($, e) => {
     const { Text } = $.ui.resolve(e)
-    return h(Text, {}, 'engine hint')
+    return Text({ children: 'engine hint' })
   })
   const mounted = await $.ui.mount({
     plugin: PLUGIN,
