@@ -62,8 +62,8 @@ export function displayWidth(text: string): number {
   return width
 }
 
-/** The longest prefix of `text` that fits in `maxColumns` cells. */
-export function fitToColumns(text: string, maxColumns: number): string {
+/** The longest prefix of `text` that fits in `maxColumns` cells, and the cells it takes. */
+export function fitToColumns(text: string, maxColumns: number): { text: string; width: number } {
   let width = 0
   let result = ''
   for (const character of text) {
@@ -72,5 +72,5 @@ export function fitToColumns(text: string, maxColumns: number): string {
     width += cells
     result += character
   }
-  return result
+  return { text: result, width }
 }

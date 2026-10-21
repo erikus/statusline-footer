@@ -1,6 +1,6 @@
 import type { Engine, Register, SessionUsage } from 'claude-code'
 import { parseAnsi, type StyledRun } from './ansi'
-import { displayWidth, fitToColumns } from './width'
+import { fitToColumns } from './width'
 
 /** The `script` option when the manifest default is somehow unset. */
 const DEFAULT_SCRIPT_RELATIVE_PATH = '.claude/statusline.sh'
@@ -88,10 +88,10 @@ export function fitRuns(runs: readonly StyledRun[], maxColumns: number): StyledR
   let remaining = maxColumns
   for (const run of runs) {
     if (remaining <= 0) break
-    const text = displayWidth(run.text) <= remaining ? run.text : fitToColumns(run.text, remaining)
+    const { text, width } = fitToColumns(run.text, remaining)
     if (text === '') break
     fitted.push({ ...run, text })
-    remaining -= displayWidth(text)
+    remaining -= width
   }
   return fitted
 }

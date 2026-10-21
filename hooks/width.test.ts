@@ -8,7 +8,7 @@ test('counts emoji as two cells and ascii as one', async () => {
 })
 
 test('cuts text at a cell boundary without splitting a wide character', async () => {
-  expect(fitToColumns('ab🧠cd', 3)).toBe('ab')
-  expect(fitToColumns('ab🧠cd', 4)).toBe('ab🧠')
-  expect(fitToColumns('abc', 10)).toBe('abc')
+  expect(fitToColumns('ab🧠cd', 3)).toEqual({ text: 'ab', width: 2 })
+  expect(fitToColumns('ab🧠cd', 4)).toEqual({ text: 'ab🧠', width: 4 })
+  expect(fitToColumns('abc', 10)).toEqual({ text: 'abc', width: 3 })
 })
