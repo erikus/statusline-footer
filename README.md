@@ -14,11 +14,11 @@ are needed; the mod only changes where its output is drawn.
 Before, with the `statusLine` setting (the status line takes a row of its own below the
 prompt):
 
-<img src="docs/before.png" width="712" alt="Claude Code prompt with the status line on its own row under the mode line">
+![Claude Code prompt with the status line on its own row under the mode line](docs/before.png)
 
 After, with the mod (the same line sits on the mode line row):
 
-<img src="docs/after.png" width="712" alt="Claude Code prompt with the status line drawn on the mode line row after the mode indicator">
+![Claude Code prompt with the status line drawn on the mode line row after the mode indicator](docs/after.png)
 
 ## Install
 
