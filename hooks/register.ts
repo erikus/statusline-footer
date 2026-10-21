@@ -106,7 +106,7 @@ async function runScript($: Engine, scriptRelativePath: string, columns: number)
   const input = await buildInput($, usage)
   const result = await $.process.run(['bash', scriptPath], {
     stdin: JSON.stringify(input),
-    env: { COLUMNS: String(Math.max(1, columns)) },
+    env: { COLUMNS: String(columns) },
     timeoutMs: SCRIPT_TIMEOUT_MS,
   })
   if (result.exitCode !== 0) {
@@ -126,6 +126,11 @@ type State = {
   isRefreshWanted: boolean
 }
 
+/** Columns left for the status line after the mode indicator; at least one. */
+function roomColumns(state: State): number {
+  return Math.max(1, state.columns - state.indicatorColumns)
+}
+
 /** Re-runs the script and redraws the hint row when its output changed; one run at a time. */
 async function refresh($: Engine, state: State): Promise<void> {
   if (state.isRefreshing) {
@@ -138,7 +143,7 @@ async function refresh($: Engine, state: State): Promise<void> {
       state.isRefreshWanted = false
       let next: string
       try {
-        next = await runScript($, state.scriptRelativePath, state.columns - state.indicatorColumns)
+        next = await runScript($, state.scriptRelativePath, roomColumns(state))
       } catch (error) {
         next = `statusline.sh failed: ${error instanceof Error ? error.message : String(error)}`
       }
@@ -199,7 +204,7 @@ export const register: Register = (on, options) => {
       return next(e)
     }
     const { Text } = $.ui.resolve(e)
-    const runs = fitRuns(parseAnsi(state.line), Math.max(1, state.columns - state.indicatorColumns)).map((run) =>
+    const runs = fitRuns(parseAnsi(state.line), roomColumns(state)).map((run) =>
       h(Text, { color: run.color, backgroundColor: run.backgroundColor, dimColor: run.dim, bold: run.bold }, run.text),
     )
     return h(Text, { wrap: 'truncate' }, ...runs)

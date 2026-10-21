@@ -51,6 +51,7 @@ for (const surface of ['terminal', 'desktop'] as const) {
 
     expect(runs.length).toBeGreaterThan(0)
     expect(runs[0]?.argv).toEqual(['bash', '/home/tester/.claude/statusline.sh'])
+    expect(runs[0]?.columns).toBe('57')
     const input = JSON.parse(runs[0]?.stdin ?? '{}')
     expect(input.model.display_name).toBe('Fable 5.1')
     expect(input.context_window.total_input_tokens).toBe(12_345)
