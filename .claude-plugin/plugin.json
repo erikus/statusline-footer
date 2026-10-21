@@ -21,6 +21,12 @@
       "description": "Status line command to run, relative to your home directory (the same script your statusLine setting ran)",
       "default": ".claude/statusline.sh",
       "title": "Status line script"
+    },
+    "indicatorColumns": {
+      "type": "number",
+      "title": "Indicator columns",
+      "description": "Columns the mode indicator takes before the status line (margin, label and separator). 23 fits \"accept edits\"; auto mode needs 20, bypass permissions 29",
+      "default": 23
     }
   }
 }

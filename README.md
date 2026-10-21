@@ -33,9 +33,15 @@ drawn twice. To go back, uninstall the mod and put the entry back, for example:
 
 ## Options
 
-| Option   | Default                 | Meaning                                                    |
-| -------- | ----------------------- | ---------------------------------------------------------- |
-| `script` | `.claude/statusline.sh` | The status line command, as a path under your home folder. |
+| Option             | Default                 | Meaning                                                                 |
+| ------------------ | ----------------------- | ----------------------------------------------------------------------- |
+| `script`           | `.claude/statusline.sh` | The status line command, as a path under your home folder.              |
+| `indicatorColumns` | `23`                    | Columns the mode indicator takes before the line (margin + label + " · "). |
+
+The mod cuts the script's output so the row never wraps. `23` fits "accept edits on", the
+longest common label. Lower it to `20` if you always run in auto mode, or raise it to `29`
+for "bypass permissions on". If no file exists at the `script` path,
+the row says so and names the path.
 
 Change it in `/config` under the plugin's row. The install step may say the option is
 "not yet set"; the default applies until you set it.

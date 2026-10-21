@@ -1,5 +1,6 @@
 import type { Engine, Register, SessionUsage } from 'claude-code'
-import { parseAnsi } from './ansi'
+import { parseAnsi, type StyledRun } from './ansi'
+import { displayWidth, fitToColumns } from './width'
 
 /** The `script` option when the manifest default is somehow unset. */
 const DEFAULT_SCRIPT_RELATIVE_PATH = '.claude/statusline.sh'
@@ -7,8 +8,12 @@ const DEFAULT_SCRIPT_RELATIVE_PATH = '.claude/statusline.sh'
 const SCRIPT_TIMEOUT_MS = 5000
 /** How often the line is refreshed with nothing else going on (git state drifts). */
 const REFRESH_INTERVAL_MS = 30000
-/** Columns the engine's own mode indicator ("⏵⏵ auto mode on · ") takes before our text. */
-const INDICATOR_COLUMNS = 20
+/**
+ * Columns the engine draws before our text: its margin, the mode indicator and the
+ * separator ("  ⏵⏵ accept edits on · "). The engine does not cut what we draw, so we
+ * fit our text into what remains; a longer indicator ("bypass permissions") still wraps.
+ */
+const DEFAULT_INDICATOR_COLUMNS = 23
 /** Terminal width assumed until the surface reports one. */
 const DEFAULT_COLUMNS = 80
 /** The threshold the status line JSON's `exceeds_200k_tokens` flag counts against. */
@@ -77,17 +82,35 @@ async function buildInput($: Engine, usage: SessionUsage): Promise<StatusLineInp
   }
 }
 
+/** Cuts the runs so that together they fit in `maxColumns` cells. */
+export function fitRuns(runs: readonly StyledRun[], maxColumns: number): StyledRun[] {
+  const fitted: StyledRun[] = []
+  let remaining = maxColumns
+  for (const run of runs) {
+    if (remaining <= 0) break
+    const text = displayWidth(run.text) <= remaining ? run.text : fitToColumns(run.text, remaining)
+    if (text === '') break
+    fitted.push({ ...run, text })
+    remaining -= displayWidth(text)
+  }
+  return fitted
+}
+
 async function runScript($: Engine, scriptRelativePath: string, columns: number): Promise<string> {
   const home = (await $.env.get('HOME')) ?? ''
+  const scriptPath = `${home}/${scriptRelativePath}`
+  if (!(await $.fs.exists(scriptPath))) {
+    return `statusline-footer: no script at ${scriptPath} (set its script option in /config)`
+  }
   const usage = await $.session.usage()
   const input = await buildInput($, usage)
-  const result = await $.process.run(['bash', `${home}/${scriptRelativePath}`], {
+  const result = await $.process.run(['bash', scriptPath], {
     stdin: JSON.stringify(input),
-    env: { COLUMNS: String(Math.max(1, columns - INDICATOR_COLUMNS)) },
+    env: { COLUMNS: String(Math.max(1, columns)) },
     timeoutMs: SCRIPT_TIMEOUT_MS,
   })
   if (result.exitCode !== 0) {
-    return `statusline.sh exited ${result.exitCode}`
+    return `statusline-footer: ${scriptRelativePath} exited ${result.exitCode}`
   }
   // A status line is one row: keep the first line, as the engine's own status line does.
   return result.stdout.split('\n')[0] ?? ''
@@ -96,6 +119,7 @@ async function runScript($: Engine, scriptRelativePath: string, columns: number)
 /** The mod's own state: the line last drawn and what it was drawn for. */
 type State = {
   scriptRelativePath: string
+  indicatorColumns: number
   line: string
   columns: number
   isRefreshing: boolean
@@ -114,7 +138,7 @@ async function refresh($: Engine, state: State): Promise<void> {
       state.isRefreshWanted = false
       let next: string
       try {
-        next = await runScript($, state.scriptRelativePath, state.columns)
+        next = await runScript($, state.scriptRelativePath, state.columns - state.indicatorColumns)
       } catch (error) {
         next = `statusline.sh failed: ${error instanceof Error ? error.message : String(error)}`
       }
@@ -130,9 +154,14 @@ async function refresh($: Engine, state: State): Promise<void> {
 
 export const register: Register = (on, options) => {
   const script = options.script
+  const indicatorColumns = options.indicatorColumns
   const state: State = {
     scriptRelativePath: typeof script === 'string' && script !== '' ? script : DEFAULT_SCRIPT_RELATIVE_PATH,
     line: '',
+    indicatorColumns:
+      typeof indicatorColumns === 'number' && Number.isFinite(indicatorColumns) && indicatorColumns >= 0
+        ? Math.floor(indicatorColumns)
+        : DEFAULT_INDICATOR_COLUMNS,
     columns: DEFAULT_COLUMNS,
     isRefreshing: false,
     isRefreshWanted: false,
@@ -170,7 +199,7 @@ export const register: Register = (on, options) => {
       return next(e)
     }
     const { Text } = $.ui.resolve(e)
-    const runs = parseAnsi(state.line).map((run) =>
+    const runs = fitRuns(parseAnsi(state.line), Math.max(1, state.columns - state.indicatorColumns)).map((run) =>
       h(Text, { color: run.color, backgroundColor: run.backgroundColor, dimColor: run.dim, bold: run.bold }, run.text),
     )
     return h(Text, { wrap: 'truncate' }, ...runs)
